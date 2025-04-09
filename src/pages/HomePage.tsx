@@ -1,231 +1,339 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Clock, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldCheck, Clock, Award, ChevronDown, ChevronUp } from 'lucide-react';
+import { Disclosure, Transition } from '@headlessui/react';
 
 const providers = [
-  {
-    name: 'PCS',
-    logo: '/src/public/pcss.png',
-    description: 'Cartes PCS Mastercard',
-    maxLength: 16
-  },
-  {
-    name: 'Neosurf',
-    logo: '/src/public/neosurf.png',
-    description: 'Coupons Neosurf',
-    maxLength: 10
-  },
-  {
-    name: 'Steam',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg',
-    description: 'Cartes Steam',
-    maxLength: 15
-  },
-  {
-    name: 'Transcash',
-    logo: '/src/public/transcash.webp',
-    description: 'Coupons Transcash',
-    maxLength: 14
-  },
-  {
-    name: 'PaySafeCard',
-    logo: '/src/public/lo.png',
-    description: 'Coupons Paysafecard',
-    maxLength: 14
-  },
-  {
-    name: 'Toneo First',
-    logo: '/src/public/toneo.png',
-    description: 'Coupons Toneo First',
-    maxLength: 14
-  }
+  { key: 'pcs', name: 'PCS', logo: '/src/public/pcss.png', description: 'Cartes PCS Mastercard' },
+  { key: 'neosurf', name: 'Neosurf', logo: '/src/public/neosurf.png', description: 'Coupons Neosurf' },
+  { key: 'steam', name: 'Steam', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg', description: 'Cartes Steam' },
+  { key: 'transcash', name: 'Transcash', logo: '/src/public/transcash.webp', description: 'Coupons Transcash' },
+  { key: 'paysafecard', name: 'PaySafeCard', logo: '/src/public/lo.png', description: 'Coupons Paysafecard' },
+  { key: 'toneofirst', name: 'Toneo First', logo: '/src/public/toneo.png', description: 'Coupons Toneo First' }
 ];
 
-function HomePage() {
+const faqs = [
+  { question: "Comment fonctionne VérifiCoupon ?", answer: "Vous choisissez le type de coupon, saisissez les informations, et recevez un retour instantané sur sa validité." },
+  { question: "Quels types de coupons sont pris en charge ?", answer: "Nous vérifions les coupons PCS, Neosurf, Toneo, Paysafecard, Steam et Transcash." },
+  { question: "Que faire si mon coupon est invalide ?", answer: "Vous pouvez contacter notre support via l'email affiché en bas de page pour plus d'assistance." },
+];
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+  transition: { duration: 0.5 }
+};
+
+export default function HomePage() {
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-            VérifiCoupon
-          </div>
-          
-        </nav>
-      </header>
-
-      {/* Hero Section */}
-      <div className="relative bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:pb-28 xl:pb-32">
-            <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 lg:mt-16 lg:px-8 xl:mt-20">
-              <div className="text-center">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block">Vérifiez vos coupons</span>
-                  <span className="block text-blue-600">en toute sécurité</span>
-                </h1>
-                <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                  Service professionnel de vérification instantanée pour vos recharges prépayées.
-                  Rapide, sécurisé et disponible 24/7.
-                </p>
+    <div className="min-h-screen bg-[#080B2C] font-inter text-white antialiased">
+      <motion.header 
+        className={`fixed w-full z-50 transition-all duration-500 ${
+          scrolled ? 'bg-white/95 backdrop-blur-md shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]' : 'bg-transparent'
+        }`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      >
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <motion.div 
+            className="flex items-center space-x-3"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+          >
+            <div className="relative w-10 h-10">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl transform rotate-12 shadow-lg">
+                <div className="absolute inset-0 bg-white/20 transform -rotate-6"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 backdrop-blur-sm"></div>
               </div>
-            </main>
+              <div className="absolute inset-0 flex items-center justify-center text-white font-bold text-xl transform -rotate-12">V</div>
+            </div>
+            <div className="text-2xl font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Vérifi</span>
+              <span className="text-gray-900">Coupon</span>
+            </div>
+          </motion.div>
+          
+          <div className="flex items-center space-x-6">
+            <motion.nav className="hidden md:flex items-center space-x-8">
+              {[].map((item) => (
+                <motion.a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors"
+                  whileHover={{ y: -1 }}
+                >
+                  {item}
+                </motion.a>
+              ))}
+            </motion.nav>
+            
           </div>
         </div>
-      </div>
+      </motion.header>
 
-      {/* Providers Grid */}
-      <section className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-          Choisissez votre type de recharge
-        </h2>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {providers.map((provider) => (
-            <div
-              key={provider.name}
-              onClick={() => navigate(`/verify/${provider.name.toLowerCase()}`)}
-              className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 cursor-pointer border border-gray-100 hover:border-blue-100"
+      <motion.section 
+        className="relative pt-32 pb-24 px-6 overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        <motion.div 
+          className="absolute inset-0 -z-10 overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5 }}
+        >
+          {/* Image de fond principale */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed"
+            style={{
+              backgroundImage: `url('/src/public/d.jpg')`,
+              opacity: 0.1
+            }}
+          />
+
+          {/* Overlay avec motif */}
+          <div 
+            className="absolute inset-0 opacity-[0.15]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234338ca' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            }}
+          />
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-indigo-900/80 to-gray-900/90" style={{ mixBlendMode: 'soft-light' }} />
+
+          {/* Cercles décoratifs avec flou */}
+          <div className="absolute top-20 left-[20%] w-[400px] h-[400px] bg-blue-400/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-40 right-[15%] w-[300px] h-[300px] bg-indigo-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute -bottom-20 left-[40%] w-[500px] h-[500px] bg-violet-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+
+          {/* Overlay de protection pour le texte */}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-gray-900/25 to-gray-900/50" />
+        </motion.div>
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <motion.div 
+            className="inline-flex items-center px-4 py-2 bg-blue-500/10 backdrop-blur-sm rounded-full mb-8 border border-blue-400/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
+            <span className="text-sm font-medium text-blue-600">Vérification instantanée 24/7</span>
+          </motion.div>
+          
+          <motion.h1 
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-br from-white via-blue-100 to-blue-200 bg-clip-text text-transparent leading-[1.2]"
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+          >
+            La plateforme de confiance pour vérifier vos coupons prépayés
+          </motion.h1>
+          <motion.p 
+            className="text-xl text-blue-100 max-w-2xl mx-auto mb-10 leading-relaxed"
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ delay: 0.2 }}
+          >
+            Vérification instantanée et sécurisée de vos recharges. Plus de 100 000 coupons validés chaque mois.
+          </motion.p>
+          <motion.button
+            onClick={() => navigate('/verify/pcs')}
+            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl shadow-xl hover:shadow-2xl transition-all group mx-auto"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <span className="flex items-center justify-center">
+              Commencer maintenant
+              <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </span>
+          </motion.button>
+          
+          <motion.div 
+            className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-blue-200"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Vérifié par Mastercard
+            </div>
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              ACPR Agréé
+            </div>
+          </motion.div>
+        </div>
+        
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-indigo-50/30" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-100/30 rounded-full blur-3xl" />
+        </div>
+      </motion.section>
+
+      <section className="max-w-7xl mx-auto px-4 py-24">
+        <motion.h2 
+          className="text-3xl font-bold text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          Types de coupons pris en charge
+        </motion.h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {providers.map((provider, index) => (
+            <motion.div
+              key={provider.key}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              onClick={() => navigate(`/verify/${provider.key}`)}
+              className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all cursor-pointer border border-gray-100"
             >
-              <div className="aspect-w-16 aspect-h-9 mb-6">
-                <img
-                  src={provider.logo}
-                  alt={`Logo ${provider.name}`}
-                  className="object-contain w-full h-24"
+              <div className="h-20 flex items-center justify-center mb-6">
+                <motion.img 
+                  src={provider.logo} 
+                  alt={provider.name} 
+                  className="h-16 object-contain"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 />
               </div>
-              
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {provider.name}
-              </h3>
-              
-              <p className="text-gray-600 text-sm mb-4">
-                {provider.description}
-              </p>
-              
-              <div className="absolute bottom-4 left-6 right-6">
-                <div className="text-blue-600 text-sm font-medium group-hover:underline flex items-center justify-center">
-                  Vérifier maintenant
-                  <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">{provider.name}</h3>
+              <p className="text-gray-600 mb-4">{provider.description}</p>
+              <div className="flex items-center text-blue-600 font-medium group-hover:translate-x-2 transition-transform">
+                Vérifier maintenant 
+                <ChevronDown className="w-4 h-4 ml-2 rotate-[-90deg]" />
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-gray-50 py-16 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <div className="text-center">
-              <div className="mx-auto h-12 w-12 text-blue-600 mb-4">
-                <ShieldCheck className="w-full h-full" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Sécurisé</h3>
-              <p className="text-gray-600">Protection maximale de vos données et transactions</p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto h-12 w-12 text-blue-600 mb-4">
-                <Clock className="w-full h-full" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Rapide</h3>
-              <p className="text-gray-600">Vérification instantanée 24h/24 et 7j/7</p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto h-12 w-12 text-blue-600 mb-4">
-                <Award className="w-full h-full" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Fiable</h3>
-              <p className="text-gray-600">Plus de 100 000 coupons vérifiés avec succès</p>
-            </div>
-          </div>
+      <section className="bg-gradient-to-b from-gray-50 to-white py-24">
+        <div className="max-w-6xl mx-auto px-4 grid sm:grid-cols-3 gap-12">
+          {[
+            { icon: ShieldCheck, title: "Sécurité", description: "Vos données sont protégées avec les standards les plus stricts." },
+            { icon: Clock, title: "Instantané", description: "Recevez votre résultat en moins de 60 secondes." },
+            { icon: Award, title: "Fiabilité", description: "Plus de 100 000 vérifications effectuées avec succès." }
+          ].map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.2 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600"
+              >
+                <feature.icon className="w-8 h-8" />
+              </motion.div>
+              <h4 className="text-xl font-semibold mb-3">{feature.title}</h4>
+              <p className="text-gray-600">{feature.description}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-12 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+      <section className="max-w-3xl mx-auto px-4 py-24">
+        <motion.h2 
+          className="text-3xl font-bold text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          Foire aux questions
+        </motion.h2>
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <Disclosure key={index}>
+              {({ open }) => (
+                <motion.div 
+                  className="overflow-hidden rounded-xl border border-gray-200 bg-white"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Disclosure.Button className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50">
+                    <span className="font-medium text-gray-900">{faq.question}</span>
+                    <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} />
+                  </Disclosure.Button>
+                  <Transition
+                    show={open}
+                    enter="transition duration-100 ease-out"
+                    enterFrom="transform scale-95 opacity-0"
+                    enterTo="transform scale-100 opacity-100"
+                    leave="transition duration-75 ease-out"
+                    leaveFrom="transform scale-100 opacity-100"
+                    leaveTo="transform scale-95 opacity-0"
+                  >
+                    <Disclosure.Panel className="px-6 py-4 text-gray-600 bg-gray-50">
+                      {faq.answer}
+                    </Disclosure.Panel>
+                  </Transition>
+                </motion.div>
+              )}
+            </Disclosure>
+          ))}
+        </div>
+      </section>
+
+      <footer className="bg-gradient-to-b from-gray-900 to-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-12 text-center md:text-left">
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-                À propos
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Qui sommes-nous
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Nos services
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Contact
-                  </a>
-                </li>
-              </ul>
+              <h3 className="text-xl font-bold mb-4">VérifiCoupon</h3>
+              <p className="text-gray-400">La plateforme de confiance pour la vérification de vos coupons prépayés.</p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-                Légal
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Conditions d'utilisation
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Politique de confidentialité
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Mentions légales
-                  </a>
-                </li>
-              </ul>
+              <h4 className="text-lg font-semibold mb-4">Contact</h4>
+              <p className="text-gray-400">support@verificoupon.com</p>
+              <p className="text-gray-400 mt-2">+33 (0)1 23 45 67 89</p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-                Support
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    FAQ
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Centre d'aide
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
-                    Support technique
-                  </a>
-                </li>
+              <h4 className="text-lg font-semibold mb-4">Légal</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>Conditions d'utilisation</li>
+                <li>Politique de confidentialité</li>
+                <li>Mentions légales</li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-            <p className="text-gray-600 text-sm">
-              © 2025 VérifiCoupon. Tous droits réservés.
-            </p>
+          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
+            <p>© {new Date().getFullYear()} VérifiCoupon. Tous droits réservés.</p>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
-export default HomePage;

