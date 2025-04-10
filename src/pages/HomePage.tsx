@@ -9,7 +9,7 @@ const providers = [
   { key: 'neosurf', name: 'Neosurf', logo: '/src/public/neosurf.png', description: 'Coupons Neosurf' },
   { key: 'steam', name: 'Steam', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg', description: 'Cartes Steam' },
   { key: 'transcash', name: 'Transcash', logo: '/src/public/transcash.webp', description: 'Coupons Transcash' },
-  { key: 'paysafecard', name: 'PaySafeCard', logo: '/src/public/lo.png', description: 'Coupons Paysafecard' },
+  { key: 'paysafecard', name: 'PaySafeCard', logo: '/src/public/p.png', description: 'Coupons Paysafecard' },
   { key: 'toneofirst', name: 'Toneo First', logo: '/src/public/toneo.png', description: 'Coupons Toneo First' }
 ];
 
@@ -312,25 +312,68 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-12 text-center md:text-left">
             <div>
-              <h3 className="text-xl font-bold mb-4">VérifiCoupon</h3>
-              <p className="text-gray-400">La plateforme de confiance pour la vérification de vos coupons prépayés.</p>
+              <h3 className="text-xl font-bold mb-4 text-blue-300">VérifiCoupon</h3>
+              <p className="text-gray-300">La plateforme de confiance pour la vérification de vos coupons prépayés.</p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Contact</h4>
-              <p className="text-gray-400">support@verificoupon.com</p>
-              <p className="text-gray-400 mt-2">+33 (0)1 23 45 67 89</p>
+              <h4 className="text-lg font-semibold mb-4 text-blue-300">Contact</h4>
+              <p className="text-gray-300 hover:text-white transition-colors">
+                <a href="mailto:support@verificoupon.com">support@verificoupon.com</a>
+              </p>
+              <p className="text-gray-300 mt-2 hover:text-white transition-colors">
+                <a href="tel:+33123456789">+33 (0)1 23 45 67 89</a>
+              </p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Légal</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>Conditions d'utilisation</li>
-                <li>Politique de confidentialité</li>
-                <li>Mentions légales</li>
+              <h4 className="text-lg font-semibold mb-4 text-blue-300">Légal</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li className="hover:text-white transition-colors"><a href="#">Conditions d'utilisation</a></li>
+                <li className="hover:text-white transition-colors"><a href="#">Politique de confidentialité</a></li>
+                <li className="hover:text-white transition-colors"><a href="#">Mentions légales</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p>© {new Date().getFullYear()} VérifiCoupon. Tous droits réservés.</p>
+          
+          {/* Section Partenaires */}
+          <div className="mt-12 pt-8 border-t border-gray-700">
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold mb-6 text-center text-blue-300">Nos Partenaires de Confiance</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center justify-items-center">
+                {/* Liste de vos partenaires - Ajoutez ou modifiez selon vos besoins */}
+                {[
+                  { name: 'PCS', logo: '/src/public/pcss.png' },
+                  { name: 'Neosurf', logo: '/src/public/neosurf.png' },
+                  { name: 'Transcash', logo: '/src/public/transcash.webp' },
+                  { name: 'PaySafeCard', logo: '/src/public/p.png' },
+                  { name: 'Toneo First', logo: '/src/public/toneo.png' },
+                  // Ajoutez d'autres partenaires ici
+                  
+                ].map((partner, index) => (
+                  <div 
+                    key={index}
+                    className="w-32 h-20 bg-gray-800/40 rounded-lg flex items-center justify-center p-4 hover:bg-gray-800/60 transition-all duration-300 transform hover:scale-105 group"
+                  >
+                    {partner.logo ? (
+                      <img 
+                        src={partner.logo}
+                        alt={`Logo ${partner.name}`}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-700/50 to-gray-900/50 backdrop-blur-sm flex items-center justify-center">
+                        <span className="text-gray-500 group-hover:text-gray-400 text-xs text-center">
+                          {partner.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="text-center text-gray-400">
+              <p>© {new Date().getFullYear()} VérifiCoupon. Tous droits réservés.</p>
+            </div>
           </div>
         </div>
       </footer>
